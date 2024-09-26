@@ -139,8 +139,7 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
     uLinkCredit.io.lcrdv        := regTXDAT.lcrdv
     uLinkCredit.io.linkState    := io.linkState
 
-    // link credit consume on flit valid
-    uLinkCredit.io.linkCreditConsume    := regTXDATFlitPend.flitv
+    
 
     // link credit return by DataLCrdReturn (not implemented)
     uLinkCredit.io.linkCreditReturn     := false.B
@@ -170,6 +169,9 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
     when (io.queue.opRead.bits.CompData.valid) {
         logicOpDoneSelect.CompData  := io.queue.operandRead.bits.Count === 0.U
     }
+
+    // transaction go link credit consume
+    uLinkCredit.io.linkCreditConsume    := logicOpDoneValid
 
     // transaction go
     val logicSelectedGo = ValidMux(uLinkCredit.io.linkCreditAvailable, io.ageSelect.out)

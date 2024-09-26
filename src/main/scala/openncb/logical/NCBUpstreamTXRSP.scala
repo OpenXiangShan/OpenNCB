@@ -126,12 +126,8 @@ class NCBUpstreamTXRSP(val uLinkActiveManager       : CHILinkActiveManagerTX,
     uLinkCredit.io.lcrdv        := regTXRSP.lcrdv
     uLinkCredit.io.linkState    := io.linkState
 
-    // link credit consume on flit valid
-    uLinkCredit.io.linkCreditConsume    := regTXRSPFlitPend.flitv
-
     // link credit return by RespLCrdReturn (not implemented)
     uLinkCredit.io.linkCreditReturn     := false.B
-
 
     // transaction valid to select
     io.ageSelect.in := io.queueUpstream.opValid.valid
@@ -169,6 +165,10 @@ class NCBUpstreamTXRSP(val uLinkActiveManager       : CHILinkActiveManagerTX,
     protected val logicOpDoneValid  = ValidMux(uLinkCredit.io.linkCreditAvailable, 
         io.queueUpstream.opValid.valid.asUInt.orR)
 
+    // transaction go link credit consume
+    uLinkCredit.io.linkCreditConsume    := logicOpDoneValid
+
+    // transaction go flit
     regTXRSPFlitPend.flitv      := logicOpDoneValid
     when (logicOpDoneValid) {
         regTXRSPFlitPend.flit.QoS       .get := io.queueUpstream.infoRead.bits.QoS
