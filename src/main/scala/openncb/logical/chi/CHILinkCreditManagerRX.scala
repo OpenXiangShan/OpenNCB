@@ -47,7 +47,7 @@ class CHILinkCreditManagerRX(val paramMaxCount          : Int       = CHI_MAX_RE
 
     // variable checks
     require(paramMaxCount           >  0, s"paramMaxCount > 0: paramMaxCount = ${paramMaxCount}")
-    require(paramInitialCount       >  0, s"paramInitialCount > 0: paramInitialCount = ${paramInitialCount}")
+    require(paramInitialCount       >= 0, s"paramInitialCount > 0: paramInitialCount = ${paramInitialCount}")
     require(paramCycleBeforeSend    >= 0, s"paramCycleBeforeSend >= 0: paramCycleBeforeSend = ${paramCycleBeforeSend}")
 
     require(paramCycleBeforeSend <= parmaMaxCycleBeforeSend,
@@ -91,6 +91,7 @@ class CHILinkCreditManagerRX(val paramMaxCount          : Int       = CHI_MAX_RE
         // monitor local signals
         val monitorCreditReturn     = Input(Bool())
         val monitorCreditConsume    = Input(Bool())
+        val monitorCreditFull       = Output(Bool())
 
         // CHI link-layer signals
         val lcrdv                   = Output(Bool())
@@ -120,16 +121,18 @@ class CHILinkCreditManagerRX(val paramMaxCount          : Int       = CHI_MAX_RE
     //
     protected val logicInitialCreditDone    = logicInitialCycleEnd && logicInitialCreditClear
 
-    // output register of Link Credit Valid
-    protected val regLcrdv  = RegNext(
-        init = 0.B, 
-        next = ValidMux(io.linkState.run, Mux(logicInitialCreditDone,
+
+    // Link Credit Valid logic
+    protected val logicLcrdv = ValidMux(io.linkState.run, Mux(logicInitialCreditDone,
             io.linkCreditProvide,
-            logicInitialCycleEnd)))
+            logicInitialCycleEnd))
+
+    // output register of Link Credit Valid
+    protected val regLcrdv  = RegNext(init = 0.B, next = logicLcrdv)
 
 
     // module output
-    io.linkCreditReady      := logicInitialCreditDone
+    io.linkCreditReady      := io.linkState.run && logicInitialCreditDone
     io.lcrdv                := regLcrdv
 
 
@@ -137,12 +140,14 @@ class CHILinkCreditManagerRX(val paramMaxCount          : Int       = CHI_MAX_RE
     protected val debugRegMonitorCreditCounter  = RegInit(0.U(paramLinkCreditCounterWidth.W))
 
     if (paramEnableMonitor) {
-        when (io.lcrdv && !io.monitorCreditConsume && !io.monitorCreditReturn) {
+        when (logicLcrdv && !io.monitorCreditConsume && !io.monitorCreditReturn) {
             debugRegMonitorCreditCounter := debugRegMonitorCreditCounter + 1.U
-        }.elsewhen (!io.lcrdv && (io.monitorCreditConsume || io.monitorCreditReturn)) {
+        }.elsewhen (!logicLcrdv && (io.monitorCreditConsume || io.monitorCreditReturn)) {
             debugRegMonitorCreditCounter := debugRegMonitorCreditCounter - 1.U
         }
     }
+
+    io.monitorCreditFull := debugRegMonitorCreditCounter === paramMaxCount.U
 
     // assertions & debugs
     /*
@@ -194,7 +199,7 @@ class CHILinkCreditManagerRX(val paramMaxCount          : Int       = CHI_MAX_RE
     *   The 'lcrdv' was not allowed to be asserted when the Link Credit received exceeded 
     *   the maximum number.
     */
-    debug.LinkCreditOverflow := paramEnableMonitor.B && (debugRegMonitorCreditCounter === paramMaxCount.U) && io.lcrdv
+    debug.LinkCreditOverflow := paramEnableMonitor.B && (debugRegMonitorCreditCounter === paramMaxCount.U) && logicLcrdv
     assert(!debug.LinkCreditOverflow,
         s"link credit overflow (with maximum ${paramMaxCount})")
 
