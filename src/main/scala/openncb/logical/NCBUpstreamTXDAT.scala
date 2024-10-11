@@ -214,12 +214,7 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
             else
                 io.queue.infoRead.bits.TxnID
         }
-        regTXDATFlitPend.flit.HomeNID       .get := {
-            if (paramNCB.readCompDMT)
-                io.queue.infoRead.bits.SrcID
-            else
-                paramNCB.readCompHomeNID.U
-        }
+        regTXDATFlitPend.flit.HomeNID       .get := io.queue.infoRead.bits.SrcID
         regTXDATFlitPend.flit.Opcode        .get := CompData.U
         regTXDATFlitPend.flit.RespErr       .get := io.queue.operandRead.bits.ReadRespErr
         regTXDATFlitPend.flit.Resp          .get := 0.U

@@ -129,13 +129,6 @@ case class NCBParameters (
     readCompDMT                 : Boolean           = true,
 
     /*
-    * readCompHomeNID: Configure the HomeNID on DMT disabled.
-    * 
-    * * By default, {@code readCompHomeNID} is set to {@value 0}. 
-    */
-    readCompHomeNID             : Int               = 0,
-
-    /*
     * acceptMemAttrAllocate: Configure whether the upstream CHI channel accepts transactions
     *                        with MemAttr of Allocate.
     * 
