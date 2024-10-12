@@ -247,8 +247,7 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
 
     // Module: Link Credit Manager
     protected val uLinkCredit   = Module(new CHILinkCreditManagerRX(
-        paramMaxCount           = paramNCB.outstandingDepth,
-        paramInitialCount       = paramNCB.outstandingDepth,
+        paramInitialCount       = 0,
         paramCycleBeforeSend    = 0,                            // TODO: parameterize on demand
         paramEnableMonitor      = true
     ))
@@ -258,19 +257,19 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
     uLinkCredit.io.linkState    := io.linkState
 
     // on Transaction Queue entry free
-    protected val uLinkCreditProvideBuffer  = uLinkCredit.attachLinkCreditProvideBuffer()
-    uLinkCreditProvideBuffer.io.linkCreditProvide := {
-        
+    uLinkCredit.io.linkCreditProvide := {
+
         val regFreePopCount     = RegInit(
-            init = 0.U(log2Up(CHIConstants.CHI_MAX_REASONABLE_LINK_CREDIT_COUNT).W))
+            init = paramNCB.outstandingDepth.U(log2Up(paramNCB.outstandingDepth + 1).W))
         
         val logicFreePopCount   = PopCount(io.queueFree.strb)
-        val logicFreeCredit     = regFreePopCount =/= 0.U
+        val logicFreeCredit     = regFreePopCount =/= 0.U && uLinkCredit.io.linkCreditReady && 
+                                                             !uLinkCredit.io.monitorCreditFull
 
         regFreePopCount := regFreePopCount + logicFreePopCount - Mux(logicFreeCredit, 1.U, 0.U)
 
-        assert (!(Cat(0.U, regFreePopCount) + logicFreePopCount)(regFreePopCount.getWidth),
-            "NCB Internal Error: transaction queue free strobe overflow")
+        assert(regFreePopCount + logicFreePopCount <= paramNCB.outstandingDepth.U,
+            "NCB Internal Error: transaction queue free strobe overflow");
 
         logicFreeCredit
     }
@@ -857,7 +856,6 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
 
         // submodule
         val linkCredit                          = chiselTypeOf(uLinkCredit.debug)
-        val linkCreditProvide                   = chiselTypeOf(uLinkCreditProvideBuffer.debug)
         val decoder                             = chiselTypeOf(uDecoder.debug)
     }
 
@@ -865,7 +863,6 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
     val debug   = IO(new DebugPort)
 
     debug.linkCredit        <> uLinkCredit.debug
-    debug.linkCreditProvide <> uLinkCreditProvideBuffer.debug
     debug.decoder           <> uDecoder.debug
 
     /* 

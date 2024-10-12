@@ -385,10 +385,6 @@ case class NCBParameters (
     axiARBufferable             : Boolean               = false
 ) {
 
-    require(outstandingDepth >= 1 && outstandingDepth <= 15, 
-        s"The legal value for 'outstandingDepth' was 1 to 15, by the AMBA CHI specification: " +
-        s"outstandingDepth = ${outstandingDepth}")
-
     if (acceptOrderEndpoint)
         require(readReceiptAfterAcception,
             s"The 'readReceiptAfterAcception' was only allowed to be true when 'acceptOrderEndpoint' was true: " +

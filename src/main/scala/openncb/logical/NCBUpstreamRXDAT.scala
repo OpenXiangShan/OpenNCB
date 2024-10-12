@@ -116,8 +116,6 @@ class NCBUpstreamRXDAT(val uLinkActiveManager       : CHILinkActiveManagerRX,
 
     // Module: Link Credit Manager
     protected val uLinkCredit   = Module(new CHILinkCreditManagerRX(
-        paramMaxCount           = paramNCB.outstandingDepth,
-        paramInitialCount       = paramNCB.outstandingDepth,
         paramCycleBeforeSend    = 0,
         paramEnableMonitor      = true
     ))
