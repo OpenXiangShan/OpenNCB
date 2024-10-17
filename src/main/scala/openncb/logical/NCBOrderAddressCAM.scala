@@ -125,7 +125,7 @@ class NCBOrderAddressCAM(implicit val p: Parameters)
         val wireUpperB  = b.head(b.getWidth - mask.getWidth)
 
         val logicLowerA = a(mask.getWidth - 1, 0) & mask
-        val logicLowerB = a(mask.getWidth - 1, 0) & mask
+        val logicLowerB = b(mask.getWidth - 1, 0) & mask
 
         (wireUpperA === wireUpperB) && (logicLowerA === logicLowerB)
     }
