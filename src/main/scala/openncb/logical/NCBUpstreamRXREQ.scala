@@ -7,6 +7,7 @@ import org.chipsalliance.cde.config.Parameters
 import org.chipsalliance.cde.config.Field
 import cc.xiangshan.openncb.EnumAXIMasterOrder
 import cc.xiangshan.openncb.WithNCBParameters
+import cc.xiangshan.openncb.chi.EnumCHIIssue
 import cc.xiangshan.openncb.axi.WithAXI4Parameters
 import cc.xiangshan.openncb.axi.field.AXI4FieldAxSIZE
 import cc.xiangshan.openncb.axi.field.AXI4FieldAxBURST
@@ -476,10 +477,22 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
 
     io.queueAllocate.bits.op.chi.Comp.barrier.CHICancelOrAXIBresp   := (
         logicTransactionWrite
-    ) && !CHIFieldMemAttr.EWA.is(regRXREQ) && (
-        (paramNCB.axiMasterOrder == EnumAXIMasterOrder.None ).B ||
-        (paramNCB.writeNoError   == false                   ).B
-    )
+    ) && {
+        /*
+        * *NOTICE: Only in AMBA CHI Issue B, the 'Comp' of writes with EWA=1 DOES NOT guarantee
+        *          the observability for later transactions with overlapping addresses.
+        *          In Issue E and later (not supporting Issue C here, so we ignore it), the 'Comp'
+        *          of writes always guarantee the observability above.
+        */
+        if (paramCHI.issue == EnumCHIIssue.B)
+            (!CHIFieldMemAttr.EWA.is(regRXREQ) && (
+                (paramNCB.axiMasterOrder == EnumAXIMasterOrder.None ).B ||
+                (paramNCB.writeNoError   == false                   ).B))
+        else
+            (!CHIFieldMemAttr.EWA.is(regRXREQ) || (
+                (paramNCB.axiMasterOrder == EnumAXIMasterOrder.None ).B ||
+                (paramNCB.writeNoError   == false                   ).B))
+    }
 
     // allocate CHI operation 'DBIDResp'
     io.queueAllocate.bits.op.chi.DBIDResp.valid := (
