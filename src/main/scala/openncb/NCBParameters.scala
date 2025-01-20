@@ -53,6 +53,29 @@ object EnumAXIMasterOrder {
 }
 
 
+/*
+* Enumeration of NCB Upstream CHI DataCheck. 
+*/
+sealed class EnumCHIDataCheck(ordinal       : Int,
+                              name          : String)
+    extends Enum[EnumCHIDataCheck](name, ordinal)
+
+object EnumCHIDataCheck {
+
+    /*
+    * Odd Parity.
+    * * Generate DataCheck and Poison field with Odd-Parity Algorithm. 
+    */
+    val OddParity       : EnumCHIDataCheck      = new EnumCHIDataCheck(0, "OddParity")
+
+    /*
+    * None.
+    * * Support no DataCheck. 
+    */
+    val None            : EnumCHIDataCheck      = new EnumCHIDataCheck(1, "None")
+}
+
+
 /* 
 * NCB Parameters.
 */
@@ -226,6 +249,15 @@ case class NCBParameters (
     * By default, {@code axiBurstAlwaysIncr} is set to {@value false}.
     */
     axiBurstAlwaysIncr          : Boolean               = false,
+
+
+    /*
+    * chiDataCheck: Configure the whether upstream CHI DataCheck was enabled and the algorithm
+    *               of data checking.
+    * 
+    * By default, {@code chiDataCheck} is set to {@value None}. 
+    */
+    chiDataCheck                : EnumCHIDataCheck      = EnumCHIDataCheck.None,
 
 
     // AXI side - AW channel

@@ -5,6 +5,7 @@ import chisel3.util.OHToUInt
 import org.chipsalliance.cde.config.Parameters
 import org.chipsalliance.cde.config.Field
 import cc.xiangshan.openncb.WithNCBParameters
+import cc.xiangshan.openncb.EnumCHIDataCheck
 import cc.xiangshan.openncb.chi.WithCHIParameters
 import cc.xiangshan.openncb.chi.CHIConstants
 import cc.xiangshan.openncb.chi.opcode.CHISNFOpcodesDAT
@@ -64,6 +65,16 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
         extends Module with WithCHIParameters
                        with WithNCBParameters
                        with CHISNFOpcodesDAT {
+
+    // requirements and constraints
+    if (paramCHI.dataCheckPresent)
+        require(paramNCB.chiDataCheck != EnumCHIDataCheck.None,
+            "DataCheck not available when 'chiDataCheck' set to None")
+    
+    if (paramCHI.poisonPresent)
+        require(paramNCB.chiDataCheck != EnumCHIDataCheck.None,
+            "Poison not available when 'chiDataCheck' set to None")
+
 
     // public parameters
     val param   = p.lift(NCBUpstreamTXDAT.PublicParametersKey)
@@ -244,6 +255,23 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
         regTXDATFlitPend.flit.TraceTag      .get := 0.U
         regTXDATFlitPend.flit.BE            .get := 0.U
         regTXDATFlitPend.flit.Data          .get := io.payloadRead.data
+
+        if (paramCHI.dataCheckPresent) {
+            paramNCB.chiDataCheck match {
+                case EnumCHIDataCheck.OddParity =>
+                    regTXDATFlitPend.flit.DataCheck.get := 
+                        VecInit((0 until paramCHI.datDataCheckWidth).map(i => io.payloadRead.data(8 * (i + 1 - 1), 8 * i).xorR ^ true.B)).asUInt
+                case _: EnumCHIDataCheck =>
+            }
+        }
+
+        if (paramCHI.poisonPresent) {
+            paramNCB.chiDataCheck match {
+                case EnumCHIDataCheck.OddParity =>
+                    regTXDATFlitPend.flit.Poison.get := 0.U
+                case _: EnumCHIDataCheck =>
+            }
+        }
     }
 
 
