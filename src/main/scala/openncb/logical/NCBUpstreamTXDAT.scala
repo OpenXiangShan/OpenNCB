@@ -259,8 +259,8 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
         if (paramCHI.dataCheckPresent) {
             paramNCB.chiDataCheck match {
                 case EnumCHIDataCheck.OddParity =>
-                    regTXDATFlitPend.flit.DataCheck.get := 
-                        VecInit((0 until paramCHI.datDataCheckWidth).map(i => io.payloadRead.data(8 * (i + 1) - 1, 8 * i).xorR ^ true.B)).asUInt
+                    regTXDATFlitPend.flit.DataCheck.get := VecInit((0 until paramCHI.datDataCheckWidth)
+                        .map(i => io.payloadRead.data(8 * (i + 1) - 1, 8 * i).xorR ^ true.B)).asUInt
                 case _: EnumCHIDataCheck =>
             }
         }
