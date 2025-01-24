@@ -20,7 +20,7 @@ trait CHISNFOpcodesREQ extends WithCHIParameters {
     val WriteNoSnpPtl               = CHIOpcode(REQ, 0x1C, "WriteNoSnpPtl"                  )
     val WriteNoSnpZero              = CHIOpcode(REQ, 0x44, "WriteNoSnpZero"             , E )
     //  -------------------------------------------------------------------------------------
-    val ReadNoSnpSep                = CHIOpcode(REQ, 0x11, "ReadNoSnpSep"                   )
+    val ReadNoSnpSep                = CHIOpcode(REQ, 0x11, "ReadNoSnpSep"               , E )
     //  -------------------------------------------------------------------------------------
     val CleanShared                 = CHIOpcode(REQ, 0x08, "CleanShared"                    )
     val CleanSharedPersist          = CHIOpcode(REQ, 0x27, "CleanSharedPersist"             )

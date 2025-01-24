@@ -77,7 +77,9 @@ class NCBTransactionQueue(implicit val p: Parameters)
         override def ready: Bool = valid & !barrier.asUInt.orR
     }
 
-    class TransactionOpCHICompData extends Bundle with TraitTransactionOpElement
+    class TransactionOpCHICompData extends Bundle with TraitTransactionOpElement {
+        val sep             = Bool()
+    }
 
     class TransactionOpAXIWriteAddress extends Bundle with TraitTransactionOpElement {
         val barrier         = new Bundle {
@@ -327,6 +329,7 @@ class NCBTransactionQueue(implicit val p: Parameters)
         val bits            = new Bundle {
             val CompData        = new Bundle {
                 val valid           = Output(Bool())
+                val sep             = Output(Bool())
             }
         }
     }
@@ -779,6 +782,7 @@ class NCBTransactionQueue(implicit val p: Parameters)
             val op  = Wire(chiselTypeOf(io.upstreamTxDat.opRead.bits))
 
             op.CompData.valid       := entry.chi.CompData.valid
+            op.CompData.sep         := entry.chi.CompData.sep
 
             (strb, op)
         }})
