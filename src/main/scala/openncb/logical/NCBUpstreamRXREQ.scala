@@ -292,6 +292,8 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
         WriteNoSnpFull,
         WriteNoSnpPtl,
     //  ------------------------
+        ReadNoSnpSep,
+    //  ------------------------
         CleanShared,
         CleanSharedPersist,
         CleanInvalid,
@@ -299,14 +301,16 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
     //  ------------------------
         PrefetchTgt
     //  ========================
-    ), true))
+    ) 
+    , true))
 
     uDecoder.io.valid   := regRXREQ.flitv
     uDecoder.io.opcode  := regRXREQ.flit.Opcode.get
 
-    protected val logicTransactionRead  = uDecoder.is(ReadNoSnp)
-    protected val logicTransactionWrite = uDecoder.is(WriteNoSnpPtl, WriteNoSnpFull)
-    protected val logicLCrdReturn       = uDecoder.is(ReqLCrdReturn)
+    protected val logicTransactionRead      = uDecoder.is(ReadNoSnp, ReadNoSnpSep)
+    protected val logicTransactionReadSep   = uDecoder.is(ReadNoSnpSep)
+    protected val logicTransactionWrite     = uDecoder.is(WriteNoSnpPtl, WriteNoSnpFull)
+    protected val logicLCrdReturn           = uDecoder.is(ReqLCrdReturn)
 
 
     // link credit consume on flit valid
@@ -521,6 +525,8 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
     io.queueAllocate.bits.op.chi.CompData.valid := (
         logicTransactionRead
     )
+
+    io.queueAllocate.bits.op.chi.CompData.sep := logicTransactionReadSep
 
     // allocate AXI operation 'WriteAddress'
     io.queueAllocate.bits.op.axi.WriteAddress.valid     := logicTransactionWrite

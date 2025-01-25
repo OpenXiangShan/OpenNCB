@@ -14,15 +14,14 @@ case class CHIParameters (
     * For NCB-200:
     *   * Functionally fully-supported CHI Issue:
     *       - Issue B
+    *       - Issue E (E.b) mostly (except CleanSharedPersistSep)
     * 
     *   * Connectional (flit fields & interface) supported CHI Issue:
     *       - Issue B
     *       - Issue E (E.b)
     * 
     *   * Future version feature: Issue E.b functionality support:
-    *       1) Receiving and handling <b>ReadNoSnpSep</b>
-    *       2) Sending <b>DataSepResp</b> and <b>RespSepData</b> responses
-    *       3) Recognizing <b>CleanSharedPersistSep</b>
+    *       1) Recognizing <b>CleanSharedPersistSep</b>
     * -------------------------------------------------------------------
     */
     issue               : EnumCHIIssue      = EnumCHIIssue.B,
