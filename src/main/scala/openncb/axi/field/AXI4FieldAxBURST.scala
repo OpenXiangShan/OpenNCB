@@ -31,7 +31,7 @@ object AXI4FieldAxBURST {
     */
     val FIXED           : Int       = 0x00
     val INCR            : Int       = 0x01
-    val WRAP            : Int       = 0x03
+    val WRAP            : Int       = 0x02
     /**/
 
     /*
