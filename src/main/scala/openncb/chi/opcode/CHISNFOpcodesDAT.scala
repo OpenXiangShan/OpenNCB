@@ -13,17 +13,17 @@ import cc.xiangshan.openncb.chi.opcode.CHIOpcodeDecoder
 */
 trait CHISNFOpcodesDAT extends WithCHIParameters {
 
-    //  =============================================================================
-    val DataLCrdReturn          = CHIOpcode(DAT, 0x00, "DataLCrdReturn"             )
-    //  -----------------------------------------------------------------------------
-    val CompData                = CHIOpcode(DAT, 0x04, "CompData"                   )
-    //  -----------------------------------------------------------------------------
-    val DataSepResp             = CHIOpcode(DAT, 0x0B, "DataSepResp"            , E )
-    //  -----------------------------------------------------------------------------
-    val WriteDataCancel         = CHIOpcode(DAT, 0x07, "WriteDataCancel"            )
-    //  -----------------------------------------------------------------------------
-    val NonCopyBackWrData       = CHIOpcode(DAT, 0x03, "NonCopyBackWrData"          )
-    //  =============================================================================
+    //  ================================================================================
+    val DataLCrdReturn          = CHIOpcode(DAT, 0x00, "DataLCrdReturn"                )
+    //  --------------------------------------------------------------------------------
+    val CompData                = CHIOpcode(DAT, 0x04, "CompData"                      )
+    //  --------------------------------------------------------------------------------
+    val DataSepResp             = CHIOpcode(DAT, 0x0B, "DataSepResp"            , C, E )
+    //  --------------------------------------------------------------------------------
+    val WriteDataCancel         = CHIOpcode(DAT, 0x07, "WriteDataCancel"               )
+    //  --------------------------------------------------------------------------------
+    val NonCopyBackWrData       = CHIOpcode(DAT, 0x03, "NonCopyBackWrData"             )
+    //  ================================================================================
 
 
     /* 
