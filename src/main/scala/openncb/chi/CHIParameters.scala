@@ -14,14 +14,18 @@ case class CHIParameters (
     * For NCB-200:
     *   * Functionally fully-supported CHI Issue:
     *       - Issue B
-    *       - Issue E (E.b) mostly (except CleanSharedPersistSep)
+    *       - Issue C
+    *       - Issue E (E.b) mostly (except WriteNoSnpZero, WriteNoSnp*Clean*, CleanSharedPersistSep)
     * 
     *   * Connectional (flit fields & interface) supported CHI Issue:
     *       - Issue B
+    *       - Issue C
     *       - Issue E (E.b)
     * 
     *   * Future version feature: Issue E.b functionality support:
-    *       1) Recognizing <b>CleanSharedPersistSep</b>
+    *       1) Support for <b>WriteNoSnpZero</b>
+    *       2) Support for <b>WriteNoSnp*Clean*</b>
+    *       3) Recognizing <b>CleanSharedPersistSep</b>
     * -------------------------------------------------------------------
     */
     issue               : EnumCHIIssue      = EnumCHIIssue.B,
@@ -126,6 +130,7 @@ case class CHIParameters (
     //  reqTxnIDWidth: Width of REQ.TxnID
     def reqTxnIDWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 8
+        case EnumCHIIssue.C     => 8
         case EnumCHIIssue.E     => 12
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -139,6 +144,7 @@ case class CHIParameters (
     //  reqSLCRepHintWidth: Width of REQ.SLCRepHint
     def reqSLCRepHintWidth      : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 7
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -152,6 +158,7 @@ case class CHIParameters (
     //  reqDeepWidth: Width of REQ.Deep
     def reqDeepWidth            : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 1
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -159,6 +166,7 @@ case class CHIParameters (
     //  reqReturnTxnIDWidth: Width of REQ.ReturnTxnID
     def reqReturnTxnIDWidth     : Int       = issue match {
         case EnumCHIIssue.B     => 8
+        case EnumCHIIssue.C     => 8
         case EnumCHIIssue.E     => 12
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -172,6 +180,7 @@ case class CHIParameters (
     //  reqOpcodeWidth: Width of REQ.Opcode
     def reqOpcodeWidth          : Int       = issue match {
         case EnumCHIIssue.B     => 6
+        case EnumCHIIssue.C     => 6
         case EnumCHIIssue.E     => 7
         case _: EnumCHIIssue    => unknownIssue 
     }
@@ -206,6 +215,7 @@ case class CHIParameters (
     //  reqDoDWTWidth: Width of REQ.DoDWT
     def reqDoDWTWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 1
         case _: EnumCHIIssue    => unknownIssue 
     }
@@ -216,6 +226,7 @@ case class CHIParameters (
     //  reqPGroupIDWidth: Width of REQ.PGroupID
     def reqPGroupIDWidth        : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 8
         case _: EnumCHIIssue    => unknownIssue 
     }
@@ -223,6 +234,7 @@ case class CHIParameters (
     //  reqStashGroupIDWidth: Width of REQ.StashGroupID
     def reqStashGroupIDWidth    : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 8
         case _: EnumCHIIssue    => unknownIssue 
     }
@@ -230,6 +242,7 @@ case class CHIParameters (
     //  reqTagGroupIDWidth: Width of REQ.TagGroupID
     def reqTagGroupIDWidth      : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 8
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -246,6 +259,7 @@ case class CHIParameters (
     //  reqTagOpWidth: Width of REQ.TagOp
     def reqTagOpWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 2
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -256,6 +270,7 @@ case class CHIParameters (
     //  reqMPAMWidth: Width of REQ.MPAM
     def reqMPAMWidth            : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => if (mpamPresent) 11 else 0
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -280,6 +295,7 @@ case class CHIParameters (
     //  datTxnIDWidth: Width of DAT.TxnID
     def datTxnIDWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 8
+        case EnumCHIIssue.C     => 8
         case EnumCHIIssue.E     => 12
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -290,6 +306,7 @@ case class CHIParameters (
     //  datOpcodeWidth: Width of DAT.Opcode
     def datOpcodeWidth          : Int       = issue match {
         case EnumCHIIssue.B     => 3
+        case EnumCHIIssue.C     => 4
         case EnumCHIIssue.E     => 4
         case _: EnumCHIIssue    => unknownIssue 
     }
@@ -309,6 +326,7 @@ case class CHIParameters (
     //  datDataSourceWidth: Width of DAT.DataSource
     def datDataSourceWidth      : Int       = issue match {
         case EnumCHIIssue.B     => 3
+        case EnumCHIIssue.C     => 3
         case EnumCHIIssue.E     => 4
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -316,6 +334,7 @@ case class CHIParameters (
     //  datCBusyWidth: Width of DAT.CBusy
     def datCBusyWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 3
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -323,6 +342,7 @@ case class CHIParameters (
     //  datDBIDWidth: Width of DAT.DBID
     def datDBIDWidth            : Int       = issue match {
         case EnumCHIIssue.B     => 8
+        case EnumCHIIssue.C     => 8
         case EnumCHIIssue.E     => 12
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -336,6 +356,7 @@ case class CHIParameters (
     //  datTagOpWidth: Width of DAT.TagOp
     def datTagOpWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 2
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -343,6 +364,7 @@ case class CHIParameters (
     //  datTagWidth: Width of DAT.Tag
     def datTagWidth             : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => dataWidth / 32
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -350,6 +372,7 @@ case class CHIParameters (
     //  datTUWidth: Width of DAT.TU
     def datTUWidth              : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => dataWidth / 128
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -389,6 +412,7 @@ case class CHIParameters (
     //  rspTxnIDWidth: Width of RSP.TxnID
     def rspTxnIDWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 8
+        case EnumCHIIssue.C     => 8
         case EnumCHIIssue.E     => 12
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -396,6 +420,7 @@ case class CHIParameters (
     //  rspOpcodeWidth: Width of RSP.Opcode
     def rspOpcodeWidth          : Int       = issue match {
         case EnumCHIIssue.B     => 4
+        case EnumCHIIssue.C     => 4
         case EnumCHIIssue.E     => 5
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -415,6 +440,7 @@ case class CHIParameters (
     //  rspCBusyWidth: Width of RSP.CBusy
     def rspCBusyWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 3
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -422,6 +448,7 @@ case class CHIParameters (
     //  rspDBIDWidth: Width of RSP.DBID
     def rspDBIDWidth            : Int       = issue match {
         case EnumCHIIssue.B     => 8
+        case EnumCHIIssue.C     => 8
         case EnumCHIIssue.E     => 12
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -429,6 +456,7 @@ case class CHIParameters (
     //  rspPGroupIDWidth: Width of RSP.PGroupID
     def rspPGroupIDWidth        : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 8
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -436,6 +464,7 @@ case class CHIParameters (
     //  rspStashGroupIDWidth: Width of RSP.StashGroupID
     def rspStashGroupIDWidth    : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 8
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -443,6 +472,7 @@ case class CHIParameters (
     //  rspTagGroupIDWidth: Width of RSP.TagGroupID
     def rspTagGroupIDWidth      : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 8
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -453,6 +483,7 @@ case class CHIParameters (
     //  rspTagOpWidth: Width of RSP.TagOp
     def rspTagOpWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => 2
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -474,6 +505,7 @@ case class CHIParameters (
     //  snpTxnIDWidth: Width of SNP.TxnID
     def snpTxnIDWidth           : Int       = issue match {
         case EnumCHIIssue.B     => 8
+        case EnumCHIIssue.C     => 8
         case EnumCHIIssue.E     => 12
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -484,6 +516,7 @@ case class CHIParameters (
     //  snpFwdTxnIDWidth: Width of SNP.FwdTxnID
     def snpFwdTxnIDWidth        : Int       = issue match {
         case EnumCHIIssue.B     => 8
+        case EnumCHIIssue.C     => 8
         case EnumCHIIssue.E     => 12
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -512,6 +545,7 @@ case class CHIParameters (
     //  snpDoNotDataPullWidth: Width of SNP.DoNotDataPull
     def snpDoNotDataPullWidth   : Int       = issue match {
         case EnumCHIIssue.B     => 1
+        case EnumCHIIssue.C     => 1
         case EnumCHIIssue.E     => 0
         case _: EnumCHIIssue    => unknownIssue
     }
@@ -525,6 +559,7 @@ case class CHIParameters (
     //  snpMPAMWidth: Width of SNP.MPAM
     def snpMPAMWidth            : Int       = issue match {
         case EnumCHIIssue.B     => 0
+        case EnumCHIIssue.C     => 0
         case EnumCHIIssue.E     => if (mpamPresent) 11 else 0
         case _: EnumCHIIssue    => unknownIssue
     }
