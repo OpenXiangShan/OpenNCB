@@ -545,7 +545,7 @@ case class CHIParameters (
     //  snpDoNotDataPullWidth: Width of SNP.DoNotDataPull
     def snpDoNotDataPullWidth   : Int       = issue match {
         case EnumCHIIssue.B     => 1
-        case EnumCHIIssue.C     => 0
+        case EnumCHIIssue.C     => 1
         case EnumCHIIssue.E     => 0
         case _: EnumCHIIssue    => unknownIssue
     }
