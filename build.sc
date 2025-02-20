@@ -9,31 +9,24 @@ import $file.`external`.`rocket-chip`.common
 import $file.`external`.`rocket-chip`.cde.common
 import $file.`external`.`rocket-chip`.hardfloat.build
 
-val defaultVersions = Map(
-  "chisel3" -> "3.6.0",
-  "chisel3-plugin" -> "3.6.0",
-  "chiseltest" -> "0.6.2",
-  "scala" -> "2.13.10"
-)
+val defaultScalaVersion = "2.13.15"
 
-def getVersion(dep: String, org: String = "edu.berkeley.cs", cross: Boolean = false) = {
-  val version = sys.env.getOrElse(dep + "Version", defaultVersions(dep))
-  if (cross)
-    ivy"$org:::$dep:$version"
-  else
-    ivy"$org::$dep:$version"
-}
+def defaultVersions = Map(
+  "chisel"        -> ivy"org.chipsalliance::chisel:6.6.0",
+  "chisel-plugin" -> ivy"org.chipsalliance:::chisel-plugin:6.6.0",
+  "chiseltest"    -> ivy"edu.berkeley.cs::chiseltest:6.0.0"
+)
 
 trait HasChisel extends ScalaModule {
   def chiselModule: Option[ScalaModule] = None
 
   def chiselPluginJar: T[Option[PathRef]] = None
 
-  def chiselIvy: Option[Dep] = Some(getVersion("chisel3"))
+  def chiselIvy: Option[Dep] = Some(defaultVersions("chisel"))
 
-  def chiselPluginIvy: Option[Dep] = Some(getVersion("chisel3-plugin", cross=true))
+  def chiselPluginIvy: Option[Dep] = Some(defaultVersions("chisel-plugin"))
 
-  override def scalaVersion = defaultVersions("scala")
+  override def scalaVersion = defaultScalaVersion
 
   override def scalacOptions = super.scalacOptions() ++
     Agg("-language:reflectiveCalls", "-Ymacro-annotations", "-Ytasty-reader")
@@ -48,9 +41,9 @@ object rocketchip extends `external`.`rocket-chip`.common.RocketChipModule with 
   val rcPath = os.pwd / "external" / "rocket-chip"
   override def millSourcePath = rcPath
 
-  def mainargsIvy = ivy"com.lihaoyi::mainargs:0.5.0"
+  def mainargsIvy = ivy"com.lihaoyi::mainargs:0.7.0"
 
-  def json4sJacksonIvy = ivy"org.json4s::json4s-jackson:4.0.5"
+  def json4sJacksonIvy = ivy"org.json4s::json4s-jackson:4.0.7"
 
   object macros extends `external`.`rocket-chip`.common.MacrosModule with HasChisel {
     def scalaReflectIvy = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
@@ -79,11 +72,11 @@ object OpenNCB extends SbtModule with HasChisel with millbuild.common.OpenNCBMod
   def rocketModule: ScalaModule = rocketchip
 
   override def scalacOptions = super.scalacOptions() ++
-    Agg("-deprecation")
+    Agg("-deprecation", "-feature")
 
   object test extends SbtModuleTests with TestModule.ScalaTest {
     override def ivyDeps = super.ivyDeps() ++ Agg(
-      getVersion("chiseltest"),
+      defaultVersions("chiseltest"),
     )
   }
 }

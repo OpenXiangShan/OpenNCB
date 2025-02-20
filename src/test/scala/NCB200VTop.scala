@@ -23,7 +23,7 @@ import cc.xiangshan.openncb.chi.intf._
 class NCB200VTop(val paramRawInterface: Boolean) extends Module {
 
     // Configurations
-    implicit val p = new Config((_, _, _) => {
+    implicit val p: Config = new Config((_, _, _) => {
 
         case AXI4ParametersKey  => new AXI4Parameters(
             idWidth             = 4,
