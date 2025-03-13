@@ -139,6 +139,7 @@ class NCBTransactionQueue(implicit val p: Parameters)
         val TxnID           = UInt(paramCHI.reqTxnIDWidth.W)
         val ReturnNID       = UInt(paramCHI.reqReturnNIDWidth.W)
         val ReturnTxnID     = UInt(paramCHI.reqReturnTxnIDWidth.W)
+        val TraceTag        = UInt(paramCHI.reqTraceTagWidth.W)
     }
 
     //

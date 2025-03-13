@@ -587,6 +587,7 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
     io.queueAllocate.bits.info.TxnID        := regRXREQ.flit.TxnID.get
     io.queueAllocate.bits.info.ReturnNID    := regRXREQ.flit.ReturnNID.get
     io.queueAllocate.bits.info.ReturnTxnID  := regRXREQ.flit.ReturnTxnID.get
+    io.queueAllocate.bits.info.TraceTag     := regRXREQ.flit.TraceTag.get
 
     // convert to CHI operands
     io.queueAllocate.bits.operand.chi.Addr  := regRXREQ.flit.Addr.get

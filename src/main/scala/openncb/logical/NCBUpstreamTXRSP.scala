@@ -189,7 +189,7 @@ class NCBUpstreamTXRSP(val uLinkActiveManager       : CHILinkActiveManagerTX,
             0.U((paramCHI.rspDBIDWidth - log2Up(io.ageSelect.out.getWidth)).W),
             OHToUInt(io.ageSelect.out)))
         regTXRSPFlitPend.flit.PCrdType  .get := 0.U
-        regTXRSPFlitPend.flit.TraceTag  .get := 0.U
+        regTXRSPFlitPend.flit.TraceTag  .get := io.queueUpstream.infoRead.bits.TraceTag
     }
 
     
