@@ -152,8 +152,10 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
 
     
 
-    // link credit return by DataLCrdReturn (not implemented)
-    uLinkCredit.io.linkCreditReturn     := false.B
+    // link credit return by DataLCrdReturn
+    val logicLCrdReturn = io.linkState.deactivate && uLinkCredit.io.linkCreditAvailable
+
+    uLinkCredit.io.linkCreditReturn     := logicLCrdReturn
 
     
     // transaction valid to select
@@ -208,7 +210,7 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
         io.queue.operandRead.bits.Count - 1.U
 
     // transaction go flit
-    regTXDATFlitPend.flitv      := logicOpDoneValid
+    regTXDATFlitPend.flitv      := logicOpDoneValid || logicLCrdReturn
     when (logicOpDoneValid) {
 
         regTXDATFlitPend.flit.QoS           .get := io.queue.infoRead.bits.QoS
@@ -226,12 +228,12 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
                 io.queue.infoRead.bits.TxnID
         }
         regTXDATFlitPend.flit.HomeNID       .get := io.queue.infoRead.bits.SrcID
-        regTXDATFlitPend.flit.Opcode        .get := { 
+        regTXDATFlitPend.flit.Opcode        .get := Mux(!io.linkState.deactivate, {
             if (DataSepResp.applicable)
                 Mux(io.queue.opRead.bits.CompData.sep, DataSepResp.U, CompData.U)
             else
                 CompData.U
-        }
+        }, DataLCrdReturn.U)
         regTXDATFlitPend.flit.RespErr       .get := io.queue.operandRead.bits.ReadRespErr
         regTXDATFlitPend.flit.Resp          .get := 0.U
         regTXDATFlitPend.flit.FwdState      (0.U)
