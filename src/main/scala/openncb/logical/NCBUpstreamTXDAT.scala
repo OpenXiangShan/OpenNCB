@@ -257,7 +257,7 @@ class NCBUpstreamTXDAT(val uLinkActiveManager       : CHILinkActiveManagerTX,
                 0.U
             }
         }
-        regTXDATFlitPend.flit.TraceTag      .get := 0.U
+        regTXDATFlitPend.flit.TraceTag      .get := io.queue.infoRead.bits.TraceTag
         regTXDATFlitPend.flit.BE            .get := 0.U
         regTXDATFlitPend.flit.Data          .get := io.payloadRead.data
 
