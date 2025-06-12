@@ -126,8 +126,10 @@ class NCBUpstreamTXRSP(val uLinkActiveManager       : CHILinkActiveManagerTX,
     uLinkCredit.io.lcrdv        := regTXRSP.lcrdv
     uLinkCredit.io.linkState    := io.linkState
 
-    // link credit return by RespLCrdReturn (not implemented)
-    uLinkCredit.io.linkCreditReturn     := false.B
+    // link credit return by RespLCrdReturn
+    val logicLCrdReturn = io.linkState.deactivate && uLinkCredit.io.linkCreditAvailable
+
+    uLinkCredit.io.linkCreditReturn     := logicLCrdReturn
 
     // transaction valid to select
     io.ageSelect.in := io.queueUpstream.opValid.valid
@@ -169,18 +171,18 @@ class NCBUpstreamTXRSP(val uLinkActiveManager       : CHILinkActiveManagerTX,
     uLinkCredit.io.linkCreditConsume    := logicOpDoneValid
 
     // transaction go flit
-    regTXRSPFlitPend.flitv      := logicOpDoneValid
+    regTXRSPFlitPend.flitv      := logicOpDoneValid || logicLCrdReturn
     when (logicOpDoneValid) {
         regTXRSPFlitPend.flit.QoS       .get := io.queueUpstream.infoRead.bits.QoS
         regTXRSPFlitPend.flit.TgtID     .get := io.queueUpstream.infoRead.bits.SrcID
         regTXRSPFlitPend.flit.SrcID     .get := io.queueUpstream.infoRead.bits.TgtID
         regTXRSPFlitPend.flit.TxnID     .get := io.queueUpstream.infoRead.bits.TxnID
-        regTXRSPFlitPend.flit.Opcode    .get := ParallelMux(Seq(
+        regTXRSPFlitPend.flit.Opcode    .get := Mux(!io.linkState.deactivate, ParallelMux(Seq(
             (logicOpDoneSelect.Comp         , Comp          .U),
             (logicOpDoneSelect.DBIDResp     , DBIDResp      .U),
             (logicOpDoneSelect.CompDBIDResp , CompDBIDResp  .U),
             (logicOpDoneSelect.ReadReceipt  , ReadReceipt   .U)
-        ))
+        )), RespLCrdReturn.U)
         regTXRSPFlitPend.flit.RespErr   .get := io.queueUpstream.operandRead.bits.WriteRespErr
         regTXRSPFlitPend.flit.Resp      .get := 0.U
         regTXRSPFlitPend.flit.FwdState  (0.U)
