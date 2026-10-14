@@ -73,5 +73,10 @@ object OpenNCB extends SbtModule with HasChisel with millbuild.common.OpenNCBMod
   override def scalacOptions = super.scalacOptions() ++
     Agg("-deprecation", "-feature")
 
-  object test extends SbtModuleTests with TestModule.ScalaTest
+  object test extends SbtModuleTests with TestModule.ScalaTest {
+
+    override def ivyDeps = super.ivyDeps() ++ Agg(
+      ivy"org.scalatest::scalatest:3.2.19"
+    )
+  }
 }
