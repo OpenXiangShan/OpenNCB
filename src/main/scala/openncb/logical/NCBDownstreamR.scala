@@ -101,7 +101,7 @@ class NCBDownstreamR(val uTransactionQueue      : NCBTransactionQueue,
 
     // RID mapping
     protected val logicRIdOH    = {
-        if (paramNCB.axiConstantAWID)
+        if (paramNCB.axiConstantARID)
             VecInit(UIntToOH(io.rid.read.index, paramNCB.outstandingDepth).asBools)
         else
             VecInit(UIntToOH(regR.bits.id, paramNCB.outstandingDepth).asBools)
