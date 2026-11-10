@@ -109,7 +109,7 @@ class NCBDownstreamR(val uTransactionQueue      : NCBTransactionQueue,
 
     // error mapping
     protected val logicRespErr  = {
-        if (paramNCB.writeNoError)
+        if (paramNCB.readNoError)
             CHIFieldRespErr.OK.U
         else
             MuxLookup(regR.bits.resp, CHIFieldRespErr.NDERR.U)(Seq(
@@ -137,7 +137,7 @@ class NCBDownstreamR(val uTransactionQueue      : NCBTransactionQueue,
     io.queue.opDone.strb    := ValidMux(logicValidLast, logicRIdOH)
 
     // chi operand update
-    if (paramNCB.writeNoError)
+    if (paramNCB.readNoError)
     {
         io.queue.operandCHIWrite.strb               := VecInit.fill(paramNCB.outstandingDepth)(false.B)
         io.queue.operandCHIWrite.bits.ReadRespErr   := CHIFieldRespErr.OK.U

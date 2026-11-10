@@ -123,7 +123,7 @@ case class NCBParameters (
     writeCompPreferSeperate     : Boolean               = false,
 
     /*
-    * writeNoError: Configure whether the AXI errors were received.
+    * writeNoError: Configure whether the AXI errors on writes were received.
     * 
     * * By default, {@code writeNoError} is set to {@value false}.
     * 
@@ -135,6 +135,20 @@ case class NCBParameters (
     *       - AXI: DECERR   -> CHI: NDERR
     */
     writeNoError                : Boolean               = false,
+
+    /*
+    * readNoError: Configure whether the AXI errors on reads were received.
+    * 
+    * * By default, {@code readNoError} is set to {@value false}.
+    * 
+    * * When {@code readNoError} set to {@value true}, 'RespErr' would always be Normal Okay.
+    *   When {@code readNoError} set to {@value false}, 'RespErr' is mapped from 'BRESP' as:
+    *       - AXI: OKAY     -> CHI: OK
+    *       - AXI: EXOKAY   -> CHI: EXOK
+    *       - AXI: SLVERR   -> CHI: NDERR
+    *       - AXI: DECERR   -> CHI: NDERR
+    */
+    readNoError                 : Boolean               = false,
 
     /*
     * readReceiptAfterAcception: Configure whether sending ReadReceipt only after
