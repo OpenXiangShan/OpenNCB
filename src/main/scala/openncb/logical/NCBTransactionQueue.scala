@@ -907,7 +907,7 @@ class NCBTransactionQueue(implicit val p: Parameters)
 
     // TXRSP operand read logic
     io.upstreamTxRsp.operandRead.bits   := ParallelMux(
-        io.upstreamTxDat.operandRead.strb.zipWithIndex.map({ case (strb, i) => {
+        io.upstreamTxRsp.operandRead.strb.zipWithIndex.map({ case (strb, i) => {
             (strb, regQueue(i).bits.operand.chi)
         }})
     )
