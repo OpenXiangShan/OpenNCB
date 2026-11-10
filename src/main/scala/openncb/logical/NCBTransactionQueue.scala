@@ -10,6 +10,7 @@ import cc.xiangshan.openncb.axi.field.AXI4FieldAxBURST
 import cc.xiangshan.openncb.axi.field.AXI4FieldAxSIZE
 import cc.xiangshan.openncb.chi.CHIConstants
 import cc.xiangshan.openncb.chi.WithCHIParameters
+import cc.xiangshan.openncb.chi.field.CHIFieldRespErr
 import cc.xiangshan.openncb.util.ParallelMux
 import cc.xiangshan.openncb.util.ValidMux
 import cc.xiangshan.openncb.debug.DebugBundle
@@ -79,6 +80,11 @@ class NCBTransactionQueue(implicit val p: Parameters)
 
     class TransactionOpCHICompData extends Bundle with TraitTransactionOpElement {
         val sep             = Bool()
+        val barrier         = new Bundle {
+            val AXIReadData = Bool()
+        }
+
+        override def ready: Bool = valid & !barrier.AXIReadData
     }
 
     class TransactionOpAXIWriteAddress extends Bundle with TraitTransactionOpElement {
@@ -733,7 +739,7 @@ class NCBTransactionQueue(implicit val p: Parameters)
         (valid, i, regQueue(i).bits.op, regQueue(i).bits.order)
     }}).foreach({ case (valid, i, entry, order) => {
         valid := VecInit(Seq(
-            entry.chi.CompData      .valid
+            entry.chi.CompData      .ready
         )).asUInt.orR & !order.valid
     }})
 
@@ -874,6 +880,7 @@ class NCBTransactionQueue(implicit val p: Parameters)
 
         when (strb) {
             entry.bits.op.axi.ReadData          .valid := false.B
+            entry.bits.op.chi.CompData.barrier.AXIReadData := false.B
         }
     }})
 
@@ -995,7 +1002,18 @@ class NCBTransactionQueue(implicit val p: Parameters)
     }}).foreach({ case (entry, strb) => {
 
         when (strb) {
-            entry.bits.operand.chi.ReadRespErr  := io.downstreamR.operandCHIWrite.bits.ReadRespErr
+            /*
+            * CHI requires NDERR in either none or all data packets. Hold it
+            * across later OKAY beats. EXOK is retained when no NDERR occurred.
+            */
+            entry.bits.operand.chi.ReadRespErr  := Mux(
+                entry.bits.operand.chi.ReadRespErr === CHIFieldRespErr.NDERR.U ||
+                    io.downstreamR.operandCHIWrite.bits.ReadRespErr === CHIFieldRespErr.NDERR.U,
+                CHIFieldRespErr.NDERR.U,
+                Mux(entry.bits.operand.chi.ReadRespErr === CHIFieldRespErr.EXOK.U,
+                    CHIFieldRespErr.EXOK.U,
+                    io.downstreamR.operandCHIWrite.bits.ReadRespErr)
+            )
         }
     }})
     /**/
