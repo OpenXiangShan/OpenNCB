@@ -171,12 +171,17 @@ class NCBTransactionPayload(implicit val p: Parameters)
     *                         - Download : CHI to AXI
     * @io input     mask    : Allocation Valid Mask, only masked segments were needed to be read,
     *                         applying to Downstream (AXI to CHI) Valid Registers.
+    * @io input     upstreamMask : Allocation Required Packet Mask for CHI-to-AXI writes.
+    *                         A set bit selects a CHI packet that must arrive before the
+    *                         corresponding AXI data can be issued. Unselected packets are
+    *                         initialized as valid so they cannot stall wider AXI beats.
     */
     class AllocatePort extends Bundle {
         val en              = Input(Bool())
         val strb            = Input(Vec(paramPayloadCapacity, Bool()))
         val upload          = Input(Bool())
         val mask            = Input(Vec(paramDownstreamMaxBeatCount, Bool()))
+        val upstreamMask    = Input(Vec(paramUpstreamMaxBeatCount, Bool()))
     }
 
     /*
@@ -221,7 +226,9 @@ class NCBTransactionPayload(implicit val p: Parameters)
     (0 until paramPayloadCapacity).foreach(i => {
 
         when (io.allocate.en & io.allocate.strb(i)) {
-            regUpstreamValid(i) := VecInit.fill(paramUpstreamMaxBeatCount)(false.B)
+            // Required packets start invalid and become valid on RXDAT. Packets not
+            // selected by upstreamMask start valid and cannot block wider AXI beats.
+            regUpstreamValid(i) := VecInit(io.allocate.upstreamMask.map(~_))
         }
 
         (0 until paramUpstreamMaxBeatCount).foreach(j => {

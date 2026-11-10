@@ -332,6 +332,35 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
     io.payloadAllocate.en       := regRXREQ.flitv & !logicLCrdReturn
     io.payloadAllocate.strb     := io.freeListAllocate.strb
     io.payloadAllocate.upload   := logicTransactionRead
+
+    /*
+    * upstreamMask selects the CHI packets required by Size and Addr.
+    * Required packets start invalid and become valid on RXDAT. All other packets
+    * start valid so partial writes do not wait for data that will never arrive.
+    */
+    io.payloadAllocate.upstreamMask := {
+        if (paramCHI.dataWidth == 128) {
+            MuxCase(VecInit((0 until 4).map(i => regRXREQ.flit.Addr.get(5, 4) === i.U)), Seq(
+                CHIFieldSize.Size64B.is(regRXREQ)   -> {
+                    VecInit.fill(4)(true.B)
+                },
+                CHIFieldSize.Size32B.is(regRXREQ)   -> {
+                    VecInit((0 until 4).map(i => regRXREQ.flit.Addr.get(5, 5) === (i >> 1).U))
+                }
+            ))
+        } else if (paramCHI.dataWidth == 256) {
+            MuxCase(VecInit((0 until 2).map(i => regRXREQ.flit.Addr.get(5, 5) === i.U)), Seq((
+                CHIFieldSize.Size64B.is(regRXREQ)   -> {
+                    VecInit.fill(2)(true.B)
+                }
+            )))
+        } else if (paramCHI.dataWidth == 512) {
+            VecInit.fill(1)(true.B)
+        } else {
+            unsupportedCHIDataWidth(paramCHI.dataWidth)
+        }
+    }
+
     io.payloadAllocate.mask     := {
         if (paramAXI4.dataWidth == 512) {
             VecInit.fill(1)(true.B)
