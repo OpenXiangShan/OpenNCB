@@ -962,11 +962,12 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
     /*
     * @assertion ZeroFirstAllowRetry
     *   The 'AllowRetry' of first flit must be asserted.
-    *   * For NCB not supporting RetryAck, all flits received on RXREQ
-    *     were expected to have 'AllowRetry = 1'.
+    *   * For NCB not supporting RetryAck, all flits received on RXREQ except
+    *     PrefetchTgt were expected to have 'AllowRetry = 1'.
     */
     if (param.enableFirstAllowRetryCheck) {
-        debug.ZeroFirstAllowRetry := XZBarrier(regRXREQ.flitv, regRXREQ.flit.AllowRetry.get =/= 1.U)
+        debug.ZeroFirstAllowRetry := XZBarrier(regRXREQ.flitv,
+            !uDecoder.is(PrefetchTgt) && regRXREQ.flit.AllowRetry.get =/= 1.U)
         assert(!debug.ZeroFirstAllowRetry,
             "[optional: enableFirstAllowRetryCheck] zero first AllowRetry")
     } else {
