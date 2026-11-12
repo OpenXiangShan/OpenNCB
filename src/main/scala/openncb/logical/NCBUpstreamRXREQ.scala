@@ -568,7 +568,13 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
 
     // allocate AXI operation 'WriteAddress'
     io.queueAllocate.bits.op.axi.WriteAddress.valid     := logicTransactionWrite
+    /*
+    * WriteDataCancel is legal before write data is sent. Hold AW for a
+    * cancelable partial write until first data or cancellation so no AW/WID
+    * state can outlive the cancelled queue and payload entries.
+    */
     io.queueAllocate.bits.op.axi.WriteAddress.barrier.CHIWriteBackData := {
+        (paramNCB.writeCancelable.B && uDecoder.is(WriteNoSnpPtl)) ||
         (paramNCB.writeNoError == true).B && !uDecoder.is(WriteNoSnpFull)
     } || paramNCB.axiAWAfterFirstData.B
 
