@@ -557,6 +557,15 @@ class NCBUpstreamRXREQ(val uLinkActiveManager       : CHILinkActiveManagerRX,
 
     io.queueAllocate.bits.op.chi.CompData.sep := logicTransactionReadSep
 
+    /*
+    * AXI permits different RRESP values on different beats. Wait for RLAST so
+    * that all CHI data packets use the final aggregated response. No barrier is
+    * needed when errors are suppressed and every response is forced to OK.
+    */
+    io.queueAllocate.bits.op.chi.CompData.barrier.AXIReadData := (
+        logicTransactionRead
+    ) && !paramNCB.readNoError.B
+
     // allocate AXI operation 'WriteAddress'
     io.queueAllocate.bits.op.axi.WriteAddress.valid     := logicTransactionWrite
     io.queueAllocate.bits.op.axi.WriteAddress.barrier.CHIWriteBackData := {
