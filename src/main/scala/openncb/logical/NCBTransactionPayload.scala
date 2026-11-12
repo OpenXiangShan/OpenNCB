@@ -296,6 +296,18 @@ class NCBTransactionPayload(implicit val p: Parameters)
     protected val regMask   = Reg(Vec(paramPayloadCapacity, Vec(paramPayloadSlotMaskCount, UInt(paramPayloadSlotMaskWidth.W))))
 
     (0 until paramPayloadCapacity).foreach(i => {
+        when (io.allocate.en & io.allocate.strb(i)) {
+            /*
+            * Every byte strobe starts deasserted on allocation. RXDAT sets only
+            * the lanes supplied by this transaction. Packets omitted by
+            * upstreamMask contribute zero instead of a previous occupant's mask.
+            */
+            regMask(i) := VecInit(Seq.fill(paramPayloadSlotMaskCount)(
+                0.U(paramPayloadSlotMaskWidth.W)))
+        }
+    })
+
+    (0 until paramPayloadCapacity).foreach(i => {
         (0 until paramUpstreamMaxBeatCount).foreach(j => {
 
             when (io.upstream.w.en & io.upstream.w.strb(i) & io.upstream.w.index(j)) {
