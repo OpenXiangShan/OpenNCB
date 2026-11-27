@@ -11,6 +11,7 @@ import cc.xiangshan.openncb.axi.field.AXI4FieldRESP
 import cc.xiangshan.openncb.axi.channel.AXI4ChannelMasterR
 import cc.xiangshan.openncb.chi.field.CHIFieldRespErr
 import cc.xiangshan.openncb.util.ValidMux
+import cc.xiangshan.openncb.util.NextCritical
 import cc.xiangshan.openncb.debug.CompanionConnection
 import cc.xiangshan.openncb.debug.DebugBundle
 import cc.xiangshan.openncb.debug.DebugSignal
@@ -150,8 +151,10 @@ class NCBDownstreamR(val uTransactionQueue      : NCBTransactionQueue,
 
     // axi operand update
     io.queue.operandAXIWrite.strb           := ValidMux(logicValidNotLast, logicRIdOH)
-    io.queue.operandAXIWrite.bits.Critical  := VecInit(
-        io.queue.operandRead.bits.Critical.asUInt.rotateLeft(1).asBools
+    io.queue.operandAXIWrite.bits.Critical  := NextCritical(
+        io.queue.operandRead.bits.Critical,
+        io.queue.operandRead.bits.Burst,
+        io.queue.operandRead.bits.Len
     )
     io.queue.operandAXIWrite.bits.Count     :=
         io.queue.operandRead.bits.Count - 1.U

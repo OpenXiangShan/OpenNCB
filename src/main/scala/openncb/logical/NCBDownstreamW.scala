@@ -10,6 +10,7 @@ import cc.xiangshan.openncb.axi.channel.AXI4ChannelMasterW
 import cc.xiangshan.openncb.debug.CompanionConnection
 import cc.xiangshan.openncb.logical.shared.SpillRegister
 import cc.xiangshan.openncb.util.ValidMux
+import cc.xiangshan.openncb.util.NextCritical
 
 
 /*
@@ -173,8 +174,10 @@ class NCBDownstreamW(val uTransactionQueue      : NCBTransactionQueue,
 
     // task operand update
     io.queue.operandWrite.strb          := logicTaskPoNRNotLast
-    io.queue.operandWrite.bits.Critical := VecInit(
-        io.queue.operandRead.bits.Critical.asUInt.rotateLeft(1).asBools
+    io.queue.operandWrite.bits.Critical := NextCritical(
+        io.queue.operandRead.bits.Critical,
+        io.queue.operandRead.bits.Burst,
+        io.queue.operandRead.bits.Len
     )
     io.queue.operandWrite.bits.Count    :=
         io.queue.operandRead.bits.Count - 1.U
