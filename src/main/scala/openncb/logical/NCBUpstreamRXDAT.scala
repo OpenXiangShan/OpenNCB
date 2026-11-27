@@ -126,7 +126,6 @@ class NCBUpstreamRXDAT(val uLinkActiveManager       : CHILinkActiveManagerRX,
 
     // credit loop back. no credit limit required on RXDAT channel.
     val uLinkCreditProvideBuffer = uLinkCredit.attachLinkCreditProvideBuffer()
-    uLinkCreditProvideBuffer.io.linkCreditProvide   := regRXDAT.flitv
 
 
     // Module: CHI Opcode Decode
@@ -146,6 +145,8 @@ class NCBUpstreamRXDAT(val uLinkActiveManager       : CHILinkActiveManagerRX,
     protected val logicTransactionData      = uDecoder.is(NonCopyBackWrData)
     protected val logicTransactionCancel    = uDecoder.is(WriteDataCancel)
     protected val logicLCrdReturn           = uDecoder.is(DataLCrdReturn)
+
+    uLinkCreditProvideBuffer.io.linkCreditProvide   := regRXDAT.flitv & !logicLCrdReturn
 
     protected val logicTxnIDToStrb          = VecInit(
         UIntToOH(regRXDAT.flit.TxnID.get, paramNCB.outstandingDepth).asBools)
